@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.exam.create_exam.dao.TopicMapper">
+    <update id="updateTopicQuality">
+        UPDATE ae_topic
+        SET quality = #{quality}
+        where id = #{id};
+    </update>
+
+    <select id="findTopicById" resultType="com.exam.create_exam.entity.AeTopic">
+        select * from ae_topic where id = #{id}
+    </select>
+
+    <select id="getAllGrade" resultType="Integer">
+        SELECT DISTINCT grade FROM ae_topic order by grade ASC;
+    </select>
+    <select id="getVersionByGrade" resultType="java.lang.Integer">
+        select DISTINCT version from ae_topic where grade = #{grade} order by version ASC
+    </select>
+
+    <select id="getSectionByGraAndVerAndSubj" resultType="java.lang.String">
+        select DISTINCT ae_topic.section from ae_topic where grade = #{param1} and version = #{param2} and subjects = #{param3} order by ae_topic.section ASC
+    </select>
+    <select id="getKpIdByGrade" resultType="java.lang.Integer">
+        select DISTINCT kp_id from ae_topic where grade = #{grade} order by kp_id ASC
+    </select>
+    <select id="getTopicTypeByGrade" resultType="java.lang.Integer">
+        select DISTINCT topic_type from ae_topic where grade = #{grade} order by topic_type ASC
+    </select>
+    <select id="getTopicByInfo" resultMap="aeHomework">
+        select * from ae_topic where grade = #{grade} and version = #{version} and subjects = #{subject}
+        and ae_topic.section in
+        <foreach collection="section" item="section" index="index" open="(" close=")" separator=",">
+            #{section}
+        </foreach>
+    </select>
+    <select id="getATopic" resultMap="aeHomework" useCache="false">
+        SELECT * FROM ae_topic ORDER BY RAND() limit 1;
+    </select>
+    <select id="getSection" resultType="java.lang.String">
+        select ae_topic.section from ae_topic where subjects = #{param1} AND grade = #{param2} AND version = #{param3};
+    </select>
+    <select id="getTopicByGradeAndSubjectAndVersion" resultMap="aeHomework">
+        select id from ae_topic where grade = #{param1} AND ae_topic.subjects = #{param2} AND version = #{param3};
+    </select>
+    <select id="getKpIdByTopicId" resultType="java.lang.String">
+        select kp_id from ae_topic where id = #{topicId};
+    </select>
+    <select id="getATopicByKpId" resultMap="aeHomework">
+        SELECT * FROM ae_topic where kp_id = #{kpId} ORDER BY RAND() limit 1;
+    </select>
+    <select id="getTopicWithoutSection" resultMap="aeHomework">
+        select * from ae_topic where grade = #{grade} and version = #{version} and subjects = #{subject} LIMIT 10 ;
+    </select>
+    <select id="getTopicBySubjectAndGradeAndVersion"
+            resultMap="aeHomework">
+        SELECT
+            *
+        FROM
+            ae_topic
+        WHERE
+            subjects = #{subject}
+            AND grade = #{grade}
+            AND version = #{version}
+            <if test="i != null">
+                LIMIT #{i},10
+            </if>
+            <if test="i == null">
+                LIMIT 10
+            </if>
+    </select>
+    <select id="getTopicIdByGradeAndSubjectAndVersion" resultType="long">
+        select id from ae_topic where grade = #{param1} AND subjects = #{param2} AND version = #{param3};
+    </select>
+    <select id="getTopicByKnoInfo" resultMap="aeHomework">
+        select * from ae_topic where grade = #{grade} and version = #{version} and subjects = #{subject}
+        <if test="knowledge != null and knowledge != ''">
+            and ae_topic.kp_id in
+            <foreach collection="knowledge" item="knowledge" index="index" open="(" close=")" separator=",">
+                #{knowledge}
+            </foreach>
+        </if>
+        order by rand()
+        limit 10;
+    </select>
+    <resultMap id="aeHomework" type="com.exam.create_exam.entity.AeTopic">
+        <id column="id" property="id"/>
+        <result column="grade" property="grade"/>
+        <result column="version" property="version"/>
+        <result column="subject" property="subjects"/>
+        <result column="address" property="address"/>
+        <result column="complexity" property="complexity"/>
+        <result column="type" property="type"/>
+        <result column="kp_id" property="kpId"/>
+        <result column="topic_type" property="topicType"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+    <!--开启默认的二级缓存 -->
+    <cache/>
+</mapper>

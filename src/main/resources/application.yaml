@@ -1,0 +1,15 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/exam_test?serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+mybatis-plus:
+  type-aliases-package: com.exam.create_exam.entity
+  mapper-locations: classpath:mapper/*mapper.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    cache-enabled: false
